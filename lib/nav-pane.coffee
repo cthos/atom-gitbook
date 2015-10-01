@@ -7,7 +7,7 @@ module.exports =
 class NavigationPane extends View
   @content: ->
     @div class: 'gitbook-navigation-pane', =>
-      @div class: 'gitbook-navigation-title', outlet: 'tree', "This is the rendered bar"
+      @div class: 'gitbook-navigation-title tool-panel', outlet: 'tree'
 
   initialize: ->
     @elementCache = {}
@@ -18,6 +18,9 @@ class NavigationPane extends View
     currentIndent = 0
 
     @root = document.createElement('ul')
+    @root.classList.add('full-menu');
+    @root.classList.add('list-tree');
+    @root.classList.add('has-collapsable-children');
     @elementCache[0] = [@root]
 
     for item in parseTime.tree
@@ -54,6 +57,7 @@ class NavigationPane extends View
 
     childEl = document.createElement('li')
     childEl.classList.add('gitbook-page-item')
+    childEl.classList.add('icon-file-text')
     # TODO Data attr for linked filename
     childEl.dataset.filename = treeEl.file
     childEl.innerHTML = treeEl.name
