@@ -1,4 +1,5 @@
 Parser = require './helper/summary-parser'
+AtomGitbook = require './atom-gitbook'
 fs = require 'fs-plus'
 {$, View} = require 'atom-space-pen-views'
 
@@ -10,6 +11,8 @@ class NavigationPane extends View
 
   initialize: ->
     @elementCache = {}
+    @AtomGitbook = new AtomGitbook
+
     project = atom.project.getPaths()
     parseTime = new Parser project[0]
     currentIndent = 0
@@ -21,6 +24,14 @@ class NavigationPane extends View
       @genDepthElement(item)
 
     @tree.append(@root)
+
+    @initEvents()
+
+  initEvents: ->
+    @on 'dblclick', '.gitbook-page-item', (e) =>
+      ## Open File in Editor window if exists.
+      console.log e.currentTarget.dataset.filename
+      @AtomGitbook.openEditorFile(e.currentTarget.dataset.filename) if e.currentTarget.dataset.filename?
 
   genDepthElement: (treeEl) ->
     treeEl.indent = 0 unless treeEl.indent
@@ -44,7 +55,7 @@ class NavigationPane extends View
     childEl = document.createElement('li')
     childEl.classList.add('gitbook-page-item')
     # TODO Data attr for linked filename
-
+    childEl.dataset.filename = treeEl.file
     childEl.innerHTML = treeEl.name
 
     parentEl.appendChild(childEl)

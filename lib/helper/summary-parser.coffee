@@ -28,3 +28,6 @@ class SummaryParser
       treeObj = indent: indent, name: arr[2], file: arr[3]
 
       @tree.push(treeObj)
+
+  generateFileFromTree: (tree) ->
+    # TODO: Be able to take a parsed tree and regen the summary file.
