@@ -28,5 +28,3 @@ class SummaryParser
       treeObj = indent: indent, name: arr[2], file: arr[3]
 
       @tree.push(treeObj)
-
-    console.log @tree

@@ -38,7 +38,7 @@ class NavigationPane extends View
 
       parentEl = document.createElement('ul')
       rootEl.appendChild(parentEl)
-      
+
       @elementCache[treeEl.indent].push(parentEl)
 
     childEl = document.createElement('li')
@@ -48,7 +48,3 @@ class NavigationPane extends View
     childEl.innerHTML = treeEl.name
 
     parentEl.appendChild(childEl)
-
-
-    # Since this should be linear, we can assume the parent is the last element
-    # from the previous root.
