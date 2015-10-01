@@ -1,14 +1,10 @@
-AtomGitbookView = require './atom-gitbook-view'
 {CompositeDisposable} = require 'atom'
 
-module.exports = AtomGitbook =
-  atomGitbookView: null
-  modalPanel: null
-  subscriptions: null
+module.exports =
+class AtomGitbook
 
   activate: (state) ->
     @atomGitbookView = new AtomGitbookView(state.atomGitbookViewState)
-    @modalPanel = atom.workspace.addModalPanel(item: @atomGitbookView.getElement(), visible: false)
 
     # Events subscribed to in atom's system can be easily cleaned up with a CompositeDisposable
     @subscriptions = new CompositeDisposable
@@ -17,7 +13,6 @@ module.exports = AtomGitbook =
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-gitbook:toggle': => @toggle()
 
   deactivate: ->
-    @modalPanel.destroy()
     @subscriptions.dispose()
     @atomGitbookView.destroy()
 
@@ -25,9 +20,9 @@ module.exports = AtomGitbook =
     atomGitbookViewState: @atomGitbookView.serialize()
 
   toggle: ->
-    console.log 'AtomGitbook was toggled!'
-
-    if @modalPanel.isVisible()
-      @modalPanel.hide()
+    if @open
+      @atomGitbookView.hide()
+      @open = false
     else
-      @modalPanel.show()
+      @atomGitbookView.show()
+      @open = true
