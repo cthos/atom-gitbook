@@ -22,11 +22,11 @@ class SummaryParser
     re = new RegExp /[\n\r]*(\s*)?\*\s+?\[([^\]]+?)\]\((.+?)\)/gi
 
     while (arr = re.exec(contents)) != null
-      indent = arr[1]
+      indent = 0
+      indent = arr[1].length if arr[1]
 
-      if indent
-        @deepestIndent = indent.length
+      treeObj = indent: indent, name: arr[2], file: arr[3]
 
-      @tree.push(indent: indent, name: arr[2], file: arr[3])
+      @tree.push(treeObj)
 
     console.log @tree
