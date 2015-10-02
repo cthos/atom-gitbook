@@ -16,6 +16,7 @@ module.exports =
 
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-gitbook:toggle': => @togglePanel()
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-gitbook:new-chapter': => @newChapter()
+    @subscriptions.add atom.commands.add 'atom-workspace', 'atom-gitbook:delete-chapter': => @deleteChapter()
 
   createView: ->
     unless @gitbookView?
@@ -31,6 +32,9 @@ module.exports =
     console.log "New Chapter invoked"
     ChapterView = require './chapter-view'
     new ChapterView().attach();
+
+  deleteChapter: ->
+    @createView().deleteChapter()
 
   togglePanel: ->
     if @open

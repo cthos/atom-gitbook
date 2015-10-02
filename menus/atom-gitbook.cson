@@ -5,6 +5,12 @@
       'label': 'New Chapter'
       'command': 'atom-gitbook:new-chapter'
     }
+  ],
+  '.gitbook-navigation-pane .gitbook-page-item': [
+    {
+      'label' : 'Delete Chapter',
+      'command' : 'atom-gitbook:delete-chapter'
+    }
   ]
 'menu': [
   {

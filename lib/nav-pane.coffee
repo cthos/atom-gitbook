@@ -33,8 +33,20 @@ class NavigationPane extends View
   initEvents: ->
     @on 'dblclick', '.gitbook-page-item', (e) =>
       ## Open File in Editor window if exists.
-      console.log e.currentTarget.dataset.filename
       @AtomGitbook.openEditorFile(e.currentTarget.dataset.filename) if e.currentTarget.dataset.filename?
+    @on 'click', '.gitbook-page-item', (e) =>
+      @deselectMenuItems() unless e.shiftKey or e.metaKey or e.ctrlKey
+      @selectElement(e.target)
+
+  selectElement: (ele) ->
+    ele.classList.add('chapter-selected')
+
+  deselectMenuItems: ->
+    # Technique borrowed from tree view
+    elements = @root.querySelectorAll('.chapter-selected')
+
+    for element in elements
+      element.classList.remove('chapter-selected')
 
   genDepthElement: (treeEl) ->
     treeEl.indent = 0 unless treeEl.indent
