@@ -11,6 +11,12 @@
       'label' : 'Delete Chapter',
       'command' : 'atom-gitbook:delete-chapter'
     }
+  ],
+  '.tree-view.full-menu' : [
+    {
+      'label' : 'Add As Chapter',
+      'command' : 'atom-gitbook:add-file-as-chapter'
+    }
   ]
 'menu': [
   {

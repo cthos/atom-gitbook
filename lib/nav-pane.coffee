@@ -13,17 +13,23 @@ class NavigationPane extends View
     @elementCache = {}
     @AtomGitbook = new AtomGitbook
 
-    @parser = new Parser(atom.project.getPaths()[0])
+    @parser = Parser.getInstance(atom.project.getPaths()[0])
     @refreshTree()
     @initEvents()
 
   initEvents: ->
     @on 'dblclick', '.gitbook-page-item', (e) =>
       ## Open File in Editor window if exists.
-      @AtomGitbook.openEditorFile(e.currentTarget.dataset.filename) if e.currentTarget.dataset.filename?
+      if e.currentTarget.dataset.filename?
+        @AtomGitbook.openEditorFile(e.currentTarget.dataset.filename, e.currentTarget.innerHTML)
     @on 'click', '.gitbook-page-item', (e) =>
       @deselectMenuItems() unless e.shiftKey or e.metaKey or e.ctrlKey
       @selectElement(e.target)
+    @on 'mousedown', '.gitbook-page-item', (e) =>
+      # Select the element if we're right clicking.
+      if e.button is 2
+        @deselectMenuItems()
+        @selectElement(e.target)
 
   selectElement: (ele) ->
     ele.classList.add('chapter-selected')
