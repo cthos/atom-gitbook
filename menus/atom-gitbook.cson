@@ -1,9 +1,9 @@
 # See https://atom.io/docs/latest/hacking-atom-package-word-count#menus for more details
 'context-menu':
-  'atom-text-editor': [
+  '.gitbook-navigation-pane': [
     {
-      'label': 'Toggle atom-gitbook'
-      'command': 'atom-gitbook:toggle'
+      'label': 'New Chapter'
+      'command': 'atom-gitbook:new-chapter'
     }
   ]
 'menu': [

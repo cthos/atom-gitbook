@@ -7,9 +7,9 @@ class SummaryParser
     @tree = []
     @deepestIndent = 0
     # TODO: Async calls
-    if fs.existsSync(directory + '/summary.md')
+    if fs.existsSync(path.join(directory, 'summary.md'))
       name = directory + '/summary.md'
-    else if fs.existsSync(directory + '/SUMMARY.md')
+    else if fs.existsSync(path.join(directory, '/SUMMARY.md'))
       name = directory + '/SUMMARY.md'
 
     unless name?
