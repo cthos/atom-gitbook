@@ -1,5 +1,6 @@
 {CompositeDisposable} = require 'atom'
 path = require 'path'
+{$} = require 'atom-space-pen-views'
 
 module.exports =
   config:
@@ -17,6 +18,7 @@ module.exports =
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-gitbook:toggle': => @togglePanel()
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-gitbook:new-chapter': => @newChapter()
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-gitbook:delete-chapter': => @deleteChapter()
+    @subscriptions.add atom.commands.add 'atom-workspace', 'atom-gitbook:add-file-as-chapter': => @addFileAsChapter()
 
   createView: ->
     unless @gitbookView?
@@ -33,7 +35,21 @@ module.exports =
     cv = new ChapterView()
     cv.attach()
     cv.onFileCreated =>
-      @gitbookView.refresh()
+      @createView.refresh()
+
+  addFileAsChapter: ->
+    selectedFile = $('.tree-view .selected .name')
+
+    return unless selectedFile[0]?
+
+    file = selectedFile[0].dataset
+    wsPath = atom.project.getPaths()[0]
+
+    Parser = require './helper/summary-parser'
+    parser = Parser.getInstance(wsPath)
+
+    parser.addSection(file.name, path.relative(wsPath, file.path))
+    @createView().refresh()
 
   deleteChapter: ->
     @createView().deleteChapter()
