@@ -13,21 +13,8 @@ class NavigationPane extends View
     @elementCache = {}
     @AtomGitbook = new AtomGitbook
 
-    project = atom.project.getPaths()
-    parseTime = new Parser project[0]
-    currentIndent = 0
-
-    @root = document.createElement('ul')
-    @root.classList.add('full-menu');
-    @root.classList.add('list-tree');
-    @root.classList.add('has-collapsable-children');
-    @elementCache[0] = [@root]
-
-    for item in parseTime.tree
-      @genDepthElement(item)
-
-    @tree.append(@root)
-
+    @parser = new Parser(atom.project.getPaths()[0])
+    @refreshTree()
     @initEvents()
 
   initEvents: ->
@@ -48,6 +35,32 @@ class NavigationPane extends View
     for element in elements
       element.classList.remove('chapter-selected')
 
+  removeSelectedEntries: ->
+    elements = @root.querySelectorAll('.chapter-selected')
+
+    return unless elements?
+
+    for ele in elements
+      @parser.deleteSection(ele.dataset.filename)
+
+    @parser.generateFileFromTree(atom.project.getPaths()[0])
+    @refreshTree()
+
+  refreshTree: ->
+    @tree[0].removeChild(@tree[0].firstChild) while @tree[0].firstChild
+    @elementCache = []
+
+    @root = document.createElement('ul')
+    @root.classList.add('full-menu');
+    @root.classList.add('list-tree');
+    @root.classList.add('has-collapsable-children');
+    @elementCache[0] = [@root]
+
+    for item in @parser.tree
+      @genDepthElement(item)
+
+    @tree.append(@root)
+
   genDepthElement: (treeEl) ->
     treeEl.indent = 0 unless treeEl.indent
 
@@ -57,8 +70,6 @@ class NavigationPane extends View
     if treeEl.indent > 0
       parentIndent = treeEl.indent - 2;
       parentIndent = 0 if parentIndent < 0
-
-      console.log treeEl
 
       rootEl = @elementCache[parentIndent][@elementCache[parentIndent].length - 1]
 
@@ -70,7 +81,6 @@ class NavigationPane extends View
     childEl = document.createElement('li')
     childEl.classList.add('gitbook-page-item')
     childEl.classList.add('icon-file-text')
-    # TODO Data attr for linked filename
     childEl.dataset.filename = treeEl.file
     childEl.innerHTML = treeEl.name
 
