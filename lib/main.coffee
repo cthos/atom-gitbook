@@ -15,10 +15,16 @@ module.exports =
     @subscriptions = new CompositeDisposable
     @createView()
 
+    @state.attached ?= true if @shouldAutoOpen()
+    @togglePanel() if @state.attached
+
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-gitbook:toggle': => @togglePanel()
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-gitbook:new-chapter': => @newChapter()
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-gitbook:delete-chapter': => @deleteChapter()
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-gitbook:add-file-as-chapter': => @addFileAsChapter()
+
+  serialize: ->
+    @state
 
   createView: ->
     unless @gitbookView?
@@ -53,6 +59,13 @@ module.exports =
 
   deleteChapter: ->
     @createView().deleteChapter()
+
+  shouldAutoOpen: ->
+    wsPath = atom.project.getPaths()[0]
+    if fs.existsSync(path.join(wsPath, 'summary.md')) or fs.existsSync(path.join(wsPath, 'book.json'))
+      return true
+
+    false
 
   togglePanel: ->
     if @open
