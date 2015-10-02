@@ -37,6 +37,14 @@ class NewChapterView extends View
       fs.writeFileSync(fullpath, '# ' + txt)
 
     atom.workspace.open(fullpath)
+
+    # TODO Make this a singleton?
+    Parser = require './helper/summary-parser'
+    parse = new Parser(wsPath)
+
+    parse.addSection(txt, filename)
+    parse.generateFileFromTree(wsPath)
+
     @close()
 
   cancel: ->
