@@ -3,6 +3,11 @@ fs = require 'fs-plus'
 
 module.exports =
 class SummaryParser
+  @instances = {}
+
+  @getInstance: (directory) ->
+    @instances[directory] ?= new SummaryParser(directory)
+
   constructor: (directory) ->
     @tree = []
     @deepestIndent = 0
@@ -38,7 +43,6 @@ class SummaryParser
 
   deleteSection: (filename) ->
     for ele, idx in @tree
-      console.log ele
       if ele.file == filename
         @tree.splice idx, 1
 
@@ -52,8 +56,6 @@ class SummaryParser
       indent = arr[1].length if arr[1]
 
       treeObj = indent: indent, name: arr[2], file: arr[3]
-
-      console.log treeObj
 
       @tree.push(treeObj)
 

@@ -29,9 +29,11 @@ module.exports =
     @gitbookView.destroy()
 
   newChapter: ->
-    console.log "New Chapter invoked"
     ChapterView = require './chapter-view'
-    new ChapterView().attach();
+    cv = new ChapterView()
+    cv.attach()
+    cv.onFileCreated =>
+      @gitbookView.refresh()
 
   deleteChapter: ->
     @createView().deleteChapter()

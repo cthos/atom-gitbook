@@ -14,6 +14,9 @@ class AtomGitbookView
     @navPanel.destroy()
     @navPane = null
 
+  refresh: ->
+    @navPane.refreshTree() if @navPane
+
   deleteChapter: ->
     atom.confirm
       message: "Are you sure you want to remove this chapter?"

@@ -13,7 +13,7 @@ class NavigationPane extends View
     @elementCache = {}
     @AtomGitbook = new AtomGitbook
 
-    @parser = new Parser(atom.project.getPaths()[0])
+    @parser = Parser.getInstance(atom.project.getPaths()[0])
     @refreshTree()
     @initEvents()
 

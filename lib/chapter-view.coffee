@@ -12,12 +12,16 @@ class NewChapterView extends View
       @subview 'miniEditor', new TextEditorView(mini: true)
 
   initialize: ->
+    @emitter = new Emitter
     atom.commands.add @element,
       # Core confirm is emitted on "enter" for the mini TextEditorView
       'core:confirm': => @onConfirm(@miniEditor.getText())
       # Cancel is escape
       'core:cancel': => @cancel()
     @miniEditor.on 'blur', => @close()
+
+  onFileCreated: (callback) ->
+    @emitter.on 'file-created', callback
 
   attach: ->
     @panel = atom.workspace.addModalPanel(item: this)
@@ -40,10 +44,11 @@ class NewChapterView extends View
 
     # TODO Make this a singleton?
     Parser = require './helper/summary-parser'
-    parse = new Parser(wsPath)
+    parse = Parser.getInstance(wsPath)
 
     parse.addSection(txt, filename)
     parse.generateFileFromTree(wsPath)
+    @emitter.emit 'file-created', filename
 
     @close()
 
