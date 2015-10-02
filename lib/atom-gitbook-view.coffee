@@ -6,12 +6,22 @@ module.exports =
 class AtomGitbookView
   constructor: (serializedState) ->
 
-
   show: ->
-    @navPanel = atom.workspace.addLeftPanel item: new NavPane
+    @navPane = new NavPane
+    @navPanel = atom.workspace.addLeftPanel item: @navPane
 
   hide: ->
     @navPanel.destroy()
+    @navPane = null
+
+  deleteChapter: ->
+    atom.confirm
+      message: "Are you sure you want to remove this chapter?"
+      buttons:
+        'Yes': =>
+          @navPane.removeSelectedEntries()
+        'No': -> null
+
 
   # Returns an object that can be retrieved when package is activated
   serialize: ->

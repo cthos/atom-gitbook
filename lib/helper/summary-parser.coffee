@@ -28,7 +28,7 @@ class SummaryParser
     toWrite = {name: name, file: path, indent: 0}
     toWriteIndex = @tree.length
 
-    for idx, ele in @tree
+    for ele, idx in @tree
       if parent? and ele.file == parent
         toWriteIndex = idx + 1
         toWrite.indent = ele.indent + 2
@@ -37,7 +37,8 @@ class SummaryParser
     @tree
 
   deleteSection: (filename) ->
-    for idx, ele in @tree
+    for ele, idx in @tree
+      console.log ele
       if ele.file == filename
         @tree.splice idx, 1
 
