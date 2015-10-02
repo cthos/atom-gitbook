@@ -35,7 +35,7 @@ module.exports =
     cv = new ChapterView()
     cv.attach()
     cv.onFileCreated =>
-      @createView.refresh()
+      @createView().refresh()
 
   addFileAsChapter: ->
     selectedFile = $('.tree-view .selected .name')
