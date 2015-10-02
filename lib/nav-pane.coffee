@@ -7,7 +7,7 @@ module.exports =
 class NavigationPane extends View
   @content: ->
     @div class: 'gitbook-navigation-pane', =>
-      @div class: 'gitbook-navigation-title tool-panel', outlet: 'tree'
+      @div class: 'gitbook-navigation-container tool-panel', outlet: 'tree'
 
   initialize: ->
     @elementCache = {}
