@@ -1,6 +1,7 @@
 {CompositeDisposable} = require 'atom'
 path = require 'path'
 {$} = require 'atom-space-pen-views'
+fs = require 'fs-plus'
 
 module.exports =
   config:
