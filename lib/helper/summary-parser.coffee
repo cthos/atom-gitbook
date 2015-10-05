@@ -9,17 +9,21 @@ class SummaryParser
     @instances[directory] ?= new SummaryParser(directory)
 
   constructor: (directory) ->
+    @loadFromFile(directory)
+
+  loadFromFile: (directory) ->
     @tree = []
-    @deepestIndent = 0
-    # TODO: Async calls
 
-    name = @getFullFilepath(directory)
+    @lastFile = @getFullFilepath(directory) if directory? or not @lastFile?
 
-    unless name?
+    unless @lastFile?
       return
 
-    contents = fs.readFileSync(name, 'utf-8')
+    contents = fs.readFileSync(@lastFile, 'utf-8')
     @parseFileToTree(contents)
+
+  reload: ->
+    @loadFromFile()
 
   getFullFilepath: (directory) ->
     if fs.existsSync(path.join(directory, 'summary.md'))
@@ -29,23 +33,35 @@ class SummaryParser
 
     return name or false
 
-  addSection: (name, path, parent) ->
+  addSection: (name, path, parent, index) ->
     toWrite = {name: name, file: path, indent: 0}
-    toWriteIndex = @tree.length
+    toWriteIndex = if index? then index else @tree.length
 
     for ele, idx in @tree
       if parent? and ele.file == parent
         toWriteIndex = idx + 1
         toWrite.indent = ele.indent + 2
 
+    # Check for children of new parent if index was passed
+    if toWriteIndex > 0 and index
+      prevEl = @tree[toWriteIndex - 1]
+      if prevEl.indent
+        toWrite.indent = prevEl.indent
+      # Look for child elements until you don't find an indent
+      while (nextEl = @tree[toWriteIndex])?
+        if nextEl.indent <= toWrite.indent
+          break
+        toWriteIndex++
+
     @tree.splice toWriteIndex, 0, toWrite
     @tree
 
+
   deleteSection: (filename) ->
     for ele, idx in @tree
-      if ele.file == filename
+      # Occasionally the tree gets borked?
+      if ele? and ele.file == filename
         @tree.splice idx, 1
-
     @tree
 
   parseFileToTree: (contents) ->
@@ -59,7 +75,9 @@ class SummaryParser
 
       @tree.push(treeObj)
 
-  generateFileFromTree: (directory) ->
+  generateFileFromTree: (file) ->
+    file = @lastFile if not file?
+
     lines = []
     for ele in @tree
       line = "* [#{ele.name}](#{ele.file})"
@@ -70,4 +88,4 @@ class SummaryParser
 
     linestr = lines.join("\n")
 
-    fs.writeFileSync(@getFullFilepath(directory), linestr)
+    fs.writeFileSync(file, linestr)

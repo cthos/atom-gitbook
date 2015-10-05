@@ -9,15 +9,23 @@ class NavigationPane extends View
     @div class: 'gitbook-navigation-pane', =>
       @div class: 'gitbook-navigation-pane-label', =>
         @h2 "Table of Contents"
-      @div class: 'gitbook-navigation-container tool-panel', outlet: 'tree'
+      @div class: 'gitbook-navigation-container tool-panel', tabindex: -1, outlet: 'tree'
 
   initialize: ->
     @elementCache = {}
     @AtomGitbook = new AtomGitbook
-
-    @parser = Parser.getInstance(atom.project.getPaths()[0])
-    @refreshTree()
+    @getParser()
     @initEvents()
+
+  getParser: ->
+    if not @parser?
+      @parser = Parser.getInstance(atom.project.getPaths()[0])
+      @parser.reload()
+    @parser
+
+  refresh: (reloadFile = false) ->
+    @getParser().reload() if reloadFile
+    @refreshTree()
 
   initEvents: ->
     @on 'dblclick', '.gitbook-page-item', (e) =>
@@ -32,6 +40,46 @@ class NavigationPane extends View
       if e.button is 2
         @deselectMenuItems()
         @selectElement(e.target)
+    @on 'dragstart', '.gitbook-page-item', (e) =>
+      @draggedElement = e.target;
+      e.stopPropagation()
+
+    @on 'dragenter', '.gitbook-page-item, .gitbook-seperator', (e) =>
+      e.stopPropagation()
+      @clearHovers()
+
+      e.target.classList.add('gitbook-hover-target')
+
+    @on 'dragleave', '.gitbook-page-item, .gitbook-seperator', (e) =>
+      e.preventDefault()
+      e.stopPropagation()
+
+    @on 'dragover', '.gitbook-page-item, .gitbook-seperator', (e) =>
+      e.preventDefault()
+      e.stopPropagation()
+
+    @on 'drop', '.gitbook-page-item, .gitbook-seperator', (e) =>
+      if @draggedElement
+        elFile = e.target.dataset.filename if e.target.dataset.filename?
+        index = e.target.dataset.index if e.target.dataset.index?
+
+        console.log elFile
+        console.log index
+
+        ds = @draggedElement.dataset
+
+        # TODO: This needs to handle when an element has children
+        @getParser().deleteSection(ds.filename)
+        @getParser().addSection(@draggedElement.innerHTML, ds.filename, elFile, index)
+        @getParser().generateFileFromTree()
+        @refresh()
+
+        @draggedElement = null
+
+  clearHovers: ->
+    hoverTargets = document.querySelectorAll('.gitbook-hover-target')
+    for h in hoverTargets
+      h.classList.remove('gitbook-hover-target')
 
   selectElement: (ele) ->
     ele.classList.add('chapter-selected')
@@ -64,12 +112,12 @@ class NavigationPane extends View
     @root.classList.add('has-collapsable-children');
     @elementCache[0] = [@root]
 
-    for item in @parser.tree
-      @genDepthElement(item)
+    for item, index in @parser.tree
+      @genDepthElement(item, index)
 
     @tree.append(@root)
 
-  genDepthElement: (treeEl) ->
+  genDepthElement: (treeEl, index) ->
     treeEl.indent = 0 unless treeEl.indent
 
     @elementCache[treeEl.indent] = [] unless @elementCache[treeEl.indent]?
@@ -90,6 +138,14 @@ class NavigationPane extends View
     childEl.classList.add('gitbook-page-item')
     childEl.classList.add('icon-file-text')
     childEl.dataset.filename = treeEl.file
+    childEl.setAttribute('draggable', true)
+
     childEl.innerHTML = treeEl.name
 
     parentEl.appendChild(childEl)
+
+    belowEl = document.createElement('div')
+    belowEl.classList.add('gitbook-seperator')
+    belowEl.dataset.index = index + 1
+
+    parentEl.appendChild(belowEl)
