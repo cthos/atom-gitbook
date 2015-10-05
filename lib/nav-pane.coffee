@@ -44,30 +44,42 @@ class NavigationPane extends View
       @draggedElement = e.target;
       e.stopPropagation()
 
-    @on 'dragenter', '.gitbook-page-item', (e) =>
+    @on 'dragenter', '.gitbook-page-item, .gitbook-seperator', (e) =>
       e.stopPropagation()
+      @clearHovers()
 
-    @on 'dragleave', '.gitbook-page-item', (e) =>
+      e.target.classList.add('gitbook-hover-target')
+
+    @on 'dragleave', '.gitbook-page-item, .gitbook-seperator', (e) =>
       e.preventDefault()
       e.stopPropagation()
 
-    @on 'dragover', '.gitbook-page-item', (e) =>
+    @on 'dragover', '.gitbook-page-item, .gitbook-seperator', (e) =>
       e.preventDefault()
       e.stopPropagation()
 
-    @on 'drop', '.gitbook-page-item', (e) =>
+    @on 'drop', '.gitbook-page-item, .gitbook-seperator', (e) =>
       if @draggedElement
-        elFile = e.target.dataset.filename
+        elFile = e.target.dataset.filename if e.target.dataset.filename?
+        index = e.target.dataset.index if e.target.dataset.index?
+
+        console.log elFile
+        console.log index
+
         ds = @draggedElement.dataset
-        console.log(@getParser().tree)
+
+        # TODO: This needs to handle when an element has children
         @getParser().deleteSection(ds.filename)
-        console.log(@getParser().tree)
-        @getParser().addSection(@draggedElement.innerHTML, ds.filename, elFile)
-        console.log(@getParser().tree)
+        @getParser().addSection(@draggedElement.innerHTML, ds.filename, elFile, index)
         @getParser().generateFileFromTree()
         @refresh()
 
         @draggedElement = null
+
+  clearHovers: ->
+    hoverTargets = document.querySelectorAll('.gitbook-hover-target')
+    for h in hoverTargets
+      h.classList.remove('gitbook-hover-target')
 
   selectElement: (ele) ->
     ele.classList.add('chapter-selected')
@@ -100,12 +112,12 @@ class NavigationPane extends View
     @root.classList.add('has-collapsable-children');
     @elementCache[0] = [@root]
 
-    for item in @parser.tree
-      @genDepthElement(item)
+    for item, index in @parser.tree
+      @genDepthElement(item, index)
 
     @tree.append(@root)
 
-  genDepthElement: (treeEl) ->
+  genDepthElement: (treeEl, index) ->
     treeEl.indent = 0 unless treeEl.indent
 
     @elementCache[treeEl.indent] = [] unless @elementCache[treeEl.indent]?
@@ -131,3 +143,9 @@ class NavigationPane extends View
     childEl.innerHTML = treeEl.name
 
     parentEl.appendChild(childEl)
+
+    belowEl = document.createElement('div')
+    belowEl.classList.add('gitbook-seperator')
+    belowEl.dataset.index = index + 1
+
+    parentEl.appendChild(belowEl)

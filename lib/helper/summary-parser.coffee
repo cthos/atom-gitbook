@@ -33,9 +33,9 @@ class SummaryParser
 
     return name or false
 
-  addSection: (name, path, parent) ->
+  addSection: (name, path, parent, index) ->
     toWrite = {name: name, file: path, indent: 0}
-    toWriteIndex = @tree.length
+    toWriteIndex = if index? then index else @tree.length
 
     for ele, idx in @tree
       if parent? and ele.file == parent
@@ -44,6 +44,7 @@ class SummaryParser
 
     @tree.splice toWriteIndex, 0, toWrite
     @tree
+
 
   deleteSection: (filename) ->
     for ele, idx in @tree
