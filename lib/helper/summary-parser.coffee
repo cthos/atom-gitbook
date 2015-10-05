@@ -42,6 +42,17 @@ class SummaryParser
         toWriteIndex = idx + 1
         toWrite.indent = ele.indent + 2
 
+    # Check for children of new parent if index was passed
+    if toWriteIndex > 0 and index
+      prevEl = @tree[toWriteIndex - 1]
+      if prevEl.indent
+        toWrite.indent = prevEl.indent
+      # Look for child elements until you don't find an indent
+      while (nextEl = @tree[toWriteIndex])?
+        if nextEl.indent <= toWrite.indent
+          break
+        toWriteIndex++
+
     @tree.splice toWriteIndex, 0, toWrite
     @tree
 
