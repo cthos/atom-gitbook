@@ -47,9 +47,9 @@ class SummaryParser
 
   deleteSection: (filename) ->
     for ele, idx in @tree
-      if ele.file == filename
+      # Occasionally the tree gets borked?
+      if ele? and ele.file == filename
         @tree.splice idx, 1
-
     @tree
 
   parseFileToTree: (contents) ->

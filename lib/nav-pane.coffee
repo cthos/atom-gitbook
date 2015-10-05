@@ -41,22 +41,33 @@ class NavigationPane extends View
         @deselectMenuItems()
         @selectElement(e.target)
     @on 'dragstart', '.gitbook-page-item', (e) =>
-      console.log "dragstart"
+      @draggedElement = e.target;
       e.stopPropagation()
 
     @on 'dragenter', '.gitbook-page-item', (e) =>
       e.stopPropagation()
-      console.log "dragenter"
 
     @on 'dragleave', '.gitbook-page-item', (e) =>
-      console.log "dragleave"
+      e.preventDefault()
+      e.stopPropagation()
 
     @on 'dragover', '.gitbook-page-item', (e) =>
-      console.log "dragover"
+      e.preventDefault()
+      e.stopPropagation()
 
     @on 'drop', '.gitbook-page-item', (e) =>
-      console.log "drop"
+      if @draggedElement
+        elFile = e.target.dataset.filename
+        ds = @draggedElement.dataset
+        console.log(@getParser().tree)
+        @getParser().deleteSection(ds.filename)
+        console.log(@getParser().tree)
+        @getParser().addSection(@draggedElement.innerHTML, ds.filename, elFile)
+        console.log(@getParser().tree)
+        @getParser().generateFileFromTree()
+        @refresh()
 
+        @draggedElement = null
 
   selectElement: (ele) ->
     ele.classList.add('chapter-selected')
