@@ -20,9 +20,9 @@ module.exports =
     @togglePanel() if @state.attached
 
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-gitbook:toggle': => @togglePanel()
-    @subscriptions.add atom.commands.add 'atom-workspace', 'atom-gitbook:new-chapter': => @newChapter()
-    @subscriptions.add atom.commands.add 'atom-workspace', 'atom-gitbook:delete-chapter': => @deleteChapter()
-    @subscriptions.add atom.commands.add 'atom-workspace', 'atom-gitbook:add-file-as-chapter': => @addFileAsChapter()
+    @subscriptions.add atom.commands.add '.gitbook-navigation-pane', 'atom-gitbook:new-chapter': => @newChapter()
+    @subscriptions.add atom.commands.add '.gitbook-navigation-pane .gitbook-page-item', 'atom-gitbook:delete-chapter': => @deleteChapter()
+    @subscriptions.add atom.commands.add '.tree-view.full-menu', 'atom-gitbook:add-file-as-chapter': => @addFileAsChapter()
 
   serialize: ->
     @state
@@ -56,6 +56,8 @@ module.exports =
     parser = Parser.getInstance(wsPath)
 
     parser.addSection(file.name, path.relative(wsPath, file.path))
+    parser.generateFileFromTree()
+
     @createView().refresh()
 
   deleteChapter: ->
@@ -70,8 +72,9 @@ module.exports =
 
   togglePanel: ->
     if @open
-      @gitbookView.hide()
+      @createView().hide()
       @open = false
     else
-      @gitbookView.show()
+      @createView().show()
+      @createView().refresh(true)
       @open = true

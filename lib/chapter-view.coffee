@@ -47,7 +47,7 @@ class NewChapterView extends View
     parse = Parser.getInstance(wsPath)
 
     parse.addSection(txt, filename)
-    parse.generateFileFromTree(wsPath)
+    parse.generateFileFromTree()
     @emitter.emit 'file-created', filename
 
     @close()

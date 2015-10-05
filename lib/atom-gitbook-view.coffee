@@ -6,16 +6,19 @@ module.exports =
 class AtomGitbookView
   constructor: (serializedState) ->
 
+  getNavPane: ->
+    if not @navPane?
+      @navPane = new NavPane
+    @navPane
+
   show: ->
-    @navPane = new NavPane
-    @navPanel = atom.workspace.addLeftPanel item: @navPane
+    @navPanel = atom.workspace.addLeftPanel item: @getNavPane()
 
   hide: ->
     @navPanel.destroy()
-    @navPane = null
 
-  refresh: ->
-    @navPane.refreshTree() if @navPane
+  refresh: (reloadFile = false) ->
+    @navPane.refresh(reloadFile) if @navPane
 
   deleteChapter: ->
     atom.confirm

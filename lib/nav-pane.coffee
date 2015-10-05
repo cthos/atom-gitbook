@@ -9,15 +9,23 @@ class NavigationPane extends View
     @div class: 'gitbook-navigation-pane', =>
       @div class: 'gitbook-navigation-pane-label', =>
         @h2 "Table of Contents"
-      @div class: 'gitbook-navigation-container tool-panel', outlet: 'tree'
+      @div class: 'gitbook-navigation-container tool-panel', tabindex: -1, outlet: 'tree'
 
   initialize: ->
     @elementCache = {}
     @AtomGitbook = new AtomGitbook
-
-    @parser = Parser.getInstance(atom.project.getPaths()[0])
-    @refreshTree()
+    @getParser()
     @initEvents()
+
+  getParser: ->
+    if not @parser?
+      @parser = Parser.getInstance(atom.project.getPaths()[0])
+      @parser.reload()
+    @parser
+
+  refresh: (reloadFile = false) ->
+    @getParser().reload() if reloadFile
+    @refreshTree()
 
   initEvents: ->
     @on 'dblclick', '.gitbook-page-item', (e) =>
@@ -32,6 +40,23 @@ class NavigationPane extends View
       if e.button is 2
         @deselectMenuItems()
         @selectElement(e.target)
+    @on 'dragstart', '.gitbook-page-item', (e) =>
+      console.log "dragstart"
+      e.stopPropagation()
+
+    @on 'dragenter', '.gitbook-page-item', (e) =>
+      e.stopPropagation()
+      console.log "dragenter"
+
+    @on 'dragleave', '.gitbook-page-item', (e) =>
+      console.log "dragleave"
+
+    @on 'dragover', '.gitbook-page-item', (e) =>
+      console.log "dragover"
+
+    @on 'drop', '.gitbook-page-item', (e) =>
+      console.log "drop"
+
 
   selectElement: (ele) ->
     ele.classList.add('chapter-selected')
@@ -90,6 +115,8 @@ class NavigationPane extends View
     childEl.classList.add('gitbook-page-item')
     childEl.classList.add('icon-file-text')
     childEl.dataset.filename = treeEl.file
+    childEl.setAttribute('draggable', true)
+
     childEl.innerHTML = treeEl.name
 
     parentEl.appendChild(childEl)
