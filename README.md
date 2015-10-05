@@ -1,5 +1,24 @@
 # atom-gitbook package
 
-A short description of your package.
+Plugin provides a Tree view for Gitbook Summary files, along with functionality that entails.
 
-![A screenshot of your package](https://f.cloud.github.com/assets/69169/2290250/c35d867a-a017-11e3-86be-cd7c5bf3ff9b.gif)
+## Developer instructions.
+
+### Clone the repo
+
+```bash
+git clone git@github.com:cthos/atom-gitbook.git
+```
+
+### Link it to your gitbook directory
+
+```bash
+ln -s /path/to/atom-gitbook ~/.atom/packages/atom-gitbook
+```
+
+### NPM Install
+
+```bash
+cd atom-gitbook
+npm install
+```
