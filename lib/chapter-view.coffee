@@ -40,7 +40,10 @@ class NewChapterView extends View
       ## TODO: Async?
       fs.writeFileSync(fullpath, '# ' + txt)
 
-    atom.workspace.open(fullpath)
+    atom.workspace.open(fullpath).then =>
+      # TODO: Helper Class?
+      editorElement = atom.views.getView(atom.workspace.getActiveTextEditor())
+      atom.commands.dispatch(editorElement, 'markdown-preview:toggle')
 
     # TODO Make this a singleton?
     Parser = require './helper/summary-parser'

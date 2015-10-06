@@ -2,6 +2,7 @@
 path = require 'path'
 {$} = require 'atom-space-pen-views'
 fs = require 'fs-plus'
+{Emitter} = require 'atom'
 
 module.exports =
   config:
@@ -13,6 +14,7 @@ module.exports =
   gitbookView: null
 
   activate: (@state) ->
+    @emitter = new Emitter
     @subscriptions = new CompositeDisposable
     @createView()
 

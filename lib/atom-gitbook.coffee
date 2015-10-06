@@ -11,7 +11,10 @@ class AtomGitbook
     filepath = path.join(curPath, filename)
 
     if fs.existsSync(filepath)
-      atom.workspace.open(filepath)
+      atom.workspace.open(filepath).then =>
+        # TODO: Helper Class?
+        editorElement = atom.views.getView(atom.workspace.getActiveTextEditor())
+        atom.commands.dispatch(editorElement, 'markdown-preview:toggle')
     else
       atom.confirm
         message: "Underlying File does not exist. Create it?"
@@ -19,5 +22,7 @@ class AtomGitbook
           'Okay': =>
             # TODO Async?
             fs.writeFileSync(filepath, '# ' + name)
-            atom.workspace.open(filepath)
+            atom.workspace.open(filepath).then =>
+              editorElement = atom.views.getView(atom.workspace.getActiveTextEditor())
+              atom.commands.dispatch(editorElement, 'markdown-preview:toggle')
           'Cancel': -> null
