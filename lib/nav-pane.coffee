@@ -99,7 +99,7 @@ class NavigationPane extends View
     for ele in elements
       @parser.deleteSection(ele.dataset.filename)
 
-    @parser.generateFileFromTree(atom.project.getPaths()[0])
+    @getParser().generateFileFromTree()
     @refreshTree()
 
   refreshTree: ->
