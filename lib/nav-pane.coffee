@@ -63,9 +63,6 @@ class NavigationPane extends View
         elFile = e.target.dataset.filename if e.target.dataset.filename?
         index = e.target.dataset.index if e.target.dataset.index?
 
-        console.log elFile
-        console.log index
-
         ds = @draggedElement.dataset
 
         # TODO: This needs to handle when an element has children
@@ -124,8 +121,11 @@ class NavigationPane extends View
     parentEl = @root
 
     if treeEl.indent > 0
-      parentIndent = treeEl.indent - 2;
-      parentIndent = 0 if parentIndent < 0
+      until parentIndent? and @elementCache[parentIndent]?
+        if not parentIndent?
+          parentIndent = treeEl.indent - 2;
+        else
+          parentIndent -= 2
 
       rootEl = @elementCache[parentIndent][@elementCache[parentIndent].length - 1]
 
