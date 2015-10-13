@@ -25,7 +25,20 @@ class AtomGitbookView
       message: "Are you sure you want to remove this chapter?"
       buttons:
         'Yes': =>
-          @navPane.removeSelectedEntries()
+          # This can probably be refactored a bit
+          removeFilesOnMenuDelete = atom.config.get('atom-gitbook.removeFilesOnMenuDelete')
+          console.log(removeFilesOnMenuDelete)
+          if removeFilesOnMenuDelete == 'Ask'
+            atom.confirm
+              message: "Would you like to remove the underlying file?"
+              buttons:
+                'Yes': => @navPane.removeSelectedEntries(true)
+                'No' : => @navPane.removeSelectedEntries()
+
+          else if removeFilesOnMenuDelete == 'Yes'
+            @navPane.removeSelectedEntries(true)
+          else
+            @navPane.removeSelectedEntries()
         'No': -> null
 
 

@@ -1,6 +1,7 @@
 Parser = require './helper/summary-parser'
 AtomGitbook = require './atom-gitbook'
 fs = require 'fs-plus'
+path = require 'path'
 {$, View} = require 'atom-space-pen-views'
 
 module.exports =
@@ -88,13 +89,16 @@ class NavigationPane extends View
     for element in elements
       element.classList.remove('chapter-selected')
 
-  removeSelectedEntries: ->
+  removeSelectedEntries: (deleteUnderlyingFiles = false) ->
     elements = @root.querySelectorAll('.chapter-selected')
 
     return unless elements?
 
     for ele in elements
       @parser.deleteSection(ele.dataset.filename)
+      if deleteUnderlyingFiles
+        fullPath = path.join(atom.project.getPaths()[0], ele.dataset.filename);
+        fs.unlinkSync(fullPath)
 
     @getParser().generateFileFromTree()
     @refreshTree()
