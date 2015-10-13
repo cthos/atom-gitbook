@@ -27,7 +27,6 @@ class AtomGitbookView
         'Yes': =>
           # This can probably be refactored a bit
           removeFilesOnMenuDelete = atom.config.get('atom-gitbook.removeFilesOnMenuDelete')
-          console.log(removeFilesOnMenuDelete)
           if removeFilesOnMenuDelete == 'Ask'
             atom.confirm
               message: "Would you like to remove the underlying file?"
