@@ -66,6 +66,9 @@ module.exports =
     @createView().deleteChapter()
 
   shouldAutoOpen: ->
+    if not atom.project.getPaths()
+      return false
+      
     wsPath = atom.project.getPaths()[0]
     if fs.existsSync(path.join(wsPath, 'summary.md')) or fs.existsSync(path.join(wsPath, 'book.json'))
       return true
