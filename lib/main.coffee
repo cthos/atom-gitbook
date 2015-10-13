@@ -7,9 +7,9 @@ fs = require 'fs-plus'
 module.exports =
   config:
     removeFilesOnMenuDelete:
-      type: 'boolean'
-      default: false
-      title: 'Delete Files on Menu Removal'
+      type: 'string'
+      default: 'No'
+      enum : ['No', 'Yes', 'Ask']
 
   gitbookView: null
 
@@ -68,7 +68,7 @@ module.exports =
   shouldAutoOpen: ->
     if not atom.project.getPaths()
       return false
-      
+
     wsPath = atom.project.getPaths()[0]
     if fs.existsSync(path.join(wsPath, 'summary.md')) or fs.existsSync(path.join(wsPath, 'book.json'))
       return true
