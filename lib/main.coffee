@@ -3,6 +3,10 @@ path = require 'path'
 {$} = require 'atom-space-pen-views'
 fs = require 'fs-plus'
 {Emitter} = require 'atom'
+IncludeParser = require './helper/include-parser'
+
+if not atom.packages.isPackageDisabled 'markdown-preview'
+  MarkdownPreviewView = require path.join(atom.packages.resolvePackagePath('markdown-preview'), 'lib', 'markdown-preview-view')
 
 module.exports =
   config:
@@ -26,6 +30,19 @@ module.exports =
     @subscriptions.add atom.commands.add '.gitbook-navigation-pane', 'atom-gitbook:new-chapter': => @newChapter()
     @subscriptions.add atom.commands.add '.gitbook-navigation-pane .gitbook-page-item', 'atom-gitbook:delete-chapter': => @deleteChapter()
     @subscriptions.add atom.commands.add '.tree-view.full-menu', 'atom-gitbook:add-file-as-chapter': => @addFileAsChapter()
+
+    if not atom.packages.isPackageDisabled 'markdown-preview'
+      @subscriptions.add atom.workspace.observeActivePaneItem (pane) => @observePane(pane)
+
+  observePane: (pane) ->
+    unless pane instanceof MarkdownPreviewView
+      return
+
+    pane.onDidChangeMarkdown =>
+      return unless pane[0]
+      replacedText = IncludeParser.parseIncludesInText(pane[0].innerHTML, pane.getPath())
+      IncludeParser.rerenderMarkdown(replacedText, pane.getPath()).then (html) =>
+        pane[0].innerHTML = html
 
   serialize: ->
     @state
