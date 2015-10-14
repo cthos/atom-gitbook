@@ -17,8 +17,9 @@ class AtomGitbookView
   hide: ->
     @navPanel.destroy()
 
-  refresh: (reloadFile = false) ->
-    @navPane.refresh(reloadFile) if @navPane
+  refresh: (reloadFile = false, clearFile = false) ->
+    # TODO: This chain is messy
+    @navPane.refresh(reloadFile, clearFile) if @navPane
 
   deleteChapter: ->
     atom.confirm

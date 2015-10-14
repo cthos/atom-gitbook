@@ -9,29 +9,51 @@ class SummaryParser
     @instances[directory] ?= new SummaryParser(directory)
 
   constructor: (directory) ->
-    @loadFromFile(directory)
+    @directory = directory
+
+    @loadFromFile(@directory)
+
+  clearFileCache: ->
+    @lastFile = null
 
   loadFromFile: (directory) ->
     @tree = []
 
     @lastFile = @getFullFilepath(directory) if directory? or not @lastFile?
 
-    unless @lastFile?
-      return
+    return unless @lastFile
 
     contents = fs.readFileSync(@lastFile, 'utf-8')
     @parseFileToTree(contents)
 
-  reload: ->
-    @loadFromFile()
+  reload: (clearFile) ->
+    directory = if clearFile then @directory else null
+    @loadFromFile(directory)
 
   getFullFilepath: (directory) ->
-    if fs.existsSync(path.join(directory, 'summary.md'))
-      name = directory + '/summary.md'
-    else if fs.existsSync(path.join(directory, '/SUMMARY.md'))
-      name = directory + '/SUMMARY.md'
+    jsonContents = @findAndParseBookJson(directory)
+    summaryName = 'summary.md'
 
-    return name or false
+    if jsonContents and jsonContents.structure and jsonContents.structure.summary
+      summaryName = jsonContents.structure.summary
+
+    summaryPath = path.join(directory, summaryName)
+
+    return false unless fs.existsSync(summaryPath)
+    summaryPath
+
+  findAndParseBookJson: (directory) ->
+    bookPath = path.join(directory, 'book.json')
+
+    return false unless fs.existsSync(bookPath)
+
+    contents = fs.readFileSync(bookPath, 'utf-8')
+    try
+      parsedContents = JSON.parse(contents)
+      return parsedContents
+    catch error
+      false
+
 
   addSection: (name, path, parent, index) ->
     toWrite = {name: name, file: path, indent: 0}
