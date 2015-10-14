@@ -24,8 +24,8 @@ class NavigationPane extends View
       @parser.reload()
     @parser
 
-  refresh: (reloadFile = false) ->
-    @getParser().reload() if reloadFile
+  refresh: (reloadFile = false, clearFile = false) ->
+    @getParser().reload(clearFile) if reloadFile
     @refreshTree()
 
   initEvents: ->

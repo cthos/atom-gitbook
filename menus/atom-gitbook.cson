@@ -27,6 +27,10 @@
         {
           'label': 'Toggle'
           'command': 'atom-gitbook:toggle'
+        },
+        {
+          'label': 'Force Reload ToC'
+          'command': 'atom-gitbook:force-reload-toc'
         }
       ]
     ]

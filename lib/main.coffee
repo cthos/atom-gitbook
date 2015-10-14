@@ -22,6 +22,7 @@ module.exports =
     @togglePanel() if @state.attached
 
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-gitbook:toggle': => @togglePanel()
+    @subscriptions.add atom.commands.add 'atom-workspace', 'atom-gitbook:force-reload-toc': => @forceReloadToC()
     @subscriptions.add atom.commands.add '.gitbook-navigation-pane', 'atom-gitbook:new-chapter': => @newChapter()
     @subscriptions.add atom.commands.add '.gitbook-navigation-pane .gitbook-page-item', 'atom-gitbook:delete-chapter': => @deleteChapter()
     @subscriptions.add atom.commands.add '.tree-view.full-menu', 'atom-gitbook:add-file-as-chapter': => @addFileAsChapter()
@@ -74,6 +75,10 @@ module.exports =
       return true
 
     false
+
+  forceReloadToC: ->
+    return unless @open
+    @createView().refresh(true, true)
 
   togglePanel: ->
     if @open
