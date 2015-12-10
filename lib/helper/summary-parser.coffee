@@ -124,7 +124,7 @@ class SummaryParser
         @tree[idx - 1] = parentEl
 
         parentPath = path.dirname(parentEl.file)
-        directory = path.join(directory, parentPath)
+        directory = path.join(basePath, parentPath)
 
         newPath = path.join(parentPath, path.basename(ele.file))
         existingPath = path.join(directory, ele.file)
@@ -136,7 +136,7 @@ class SummaryParser
         curpos = idx
         for i in [idx..0]
           continue unless @tree[i].indent < ele.indent
-          # TODO: Methodize
+
           parentPath = path.dirname(@tree[i].file)
           newPath = path.join(parentPath, path.basename(ele.file))
           ele.file = newPath
