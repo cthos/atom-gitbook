@@ -21,6 +21,9 @@ class AtomGitbookView
     # TODO: This chain is messy
     @navPane.refresh(reloadFile, clearFile) if @navPane
 
+  organizeSummary: ->
+    @getNavPane().getParser().organizeFilesFromTree()
+
   deleteChapter: ->
     atom.confirm
       message: "Are you sure you want to remove this chapter?"

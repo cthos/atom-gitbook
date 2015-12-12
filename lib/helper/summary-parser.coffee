@@ -1,5 +1,6 @@
 path = require 'path'
 fs = require 'fs-plus'
+slug = require 'slug'
 
 module.exports =
 class SummaryParser
@@ -111,3 +112,74 @@ class SummaryParser
     linestr = lines.join("\n")
 
     fs.writeFileSync(file, linestr)
+
+  organizeFilesFromTree: (rootPath, file) ->
+    lastIndent = 0;
+    directory = basePath = atom.project.getPaths()[0]
+
+    for ele, idx in @tree
+      ele.file = slug(ele.name, {replacement: "_", lower: true}) + '.md'
+      # TODO: Not quite right, doesn't cover situation where it jumps back up an indent level
+      if ele.indent > lastIndent
+        parentEl = @ensureEleFolderFormat(directory, basePath, previousElement)
+        @tree[idx - 1] = parentEl
+
+        parentPath = path.dirname(parentEl.file)
+        directory = path.join(basePath, parentPath)
+
+        newPath = path.join(parentPath, path.basename(ele.file))
+        existingPath = path.join(directory, ele.file)
+        ele.file = newPath
+
+        # fs.moveSync(existingPath, path.join(directory, newPath)) if fs.statSync(existingPath).isFile()
+      else if ele.indent > 0
+        # reverse iterate over the tree until you find the common parent
+        curpos = idx
+        for i in [idx..0]
+          continue unless @tree[i].indent < ele.indent
+
+          parentPath = path.dirname(@tree[i].file)
+          newPath = path.join(parentPath, path.basename(ele.file))
+          oldPath = ele.file
+          ele.file = newPath
+
+          try
+            fs.moveSync(oldPath, newPath) if fs.statSync(oldPath).isFile()
+
+          break
+      else if ele.indent == 0
+        oldPath = ele.file
+        directory = basePath
+
+        try
+          fs.moveSync(oldPath, ele.file) if fs.statSync(oldPath).isFile()
+
+      previousElement = ele
+      lastIndent = ele.indent
+
+    @generateFileFromTree()
+
+    # gitbook init if available and configured to do so? TODO: Finish and test
+    # if atom.config.get('atom-gitbook.runGitbookInitAutomatically')
+      # require('child-process').exec('gitbook init')
+
+  ensureEleFolderFormat: (rootPath, basePath, ele) ->
+    summaryFileName = atom.config.get('atom-gitbook.chapterSummaryFileName')
+    return ele if path.basename(ele.file) == summaryFileName and path.dirname(ele.file) == basePath
+
+    folderSlug = slug(path.basename(ele.file, 'md'), {replacement: "_", lower: true})
+    folderPath = path.join(rootPath, folderSlug)
+
+    try
+      fs.statSync(folderPath).isDirectory()
+    catch
+      fs.mkdirSync(folderPath)
+
+    filename = path.join(folderPath, summaryFileName)
+
+    existingPath = path.join(rootPath, ele.file)
+    try
+      fs.moveSync(existingPath, filename) if fs.statSync(existingPath).isFile()
+
+    ele.file = path.relative(basePath, filename)
+    ele

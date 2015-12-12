@@ -28,6 +28,8 @@ class NavigationPane extends View
     @getParser().reload(clearFile) if reloadFile
     @refreshTree()
 
+    @getParser().organizeFilesFromTree() if atom.config.get('atom-gitbook.autoOrganizeSummaryFileOnToCChange')
+
   initEvents: ->
     @on 'dblclick', '.gitbook-page-item', (e) =>
       ## Open File in Editor window if exists.
@@ -66,7 +68,6 @@ class NavigationPane extends View
 
         ds = @draggedElement.dataset
 
-        # TODO: This needs to handle when an element has children
         @getParser().deleteSection(ds.filename)
         @getParser().addSection(@draggedElement.innerHTML, ds.filename, elFile, index)
         @getParser().generateFileFromTree()

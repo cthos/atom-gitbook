@@ -14,6 +14,25 @@ module.exports =
       type: 'string'
       default: 'No'
       enum : ['No', 'Yes', 'Ask']
+    autoOrganizeSummaryFileOnToCChange:
+      title: "Reorder Files on Table of Contents Change"
+      description: "Automatically creates a folder/file structure based on the Table of Contents when it's changed via the Table of Contents"
+      type: 'boolean'
+      default: false
+    reportFolder:
+      title: "Folder in which the report is located"
+      description: "This is used when autogenerating a directory structure."
+      type: 'string'
+      default: './'
+    runGitbookInitAutomatically:
+      title: "Run gitbook init automatically"
+      description: "On certian ToC Changes, gitbook init can be run to fill out underlying files."
+      type: 'boolean'
+      default: false
+    chapterSummaryFileName:
+      title: "Chapter summary file name"
+      type: 'string'
+      default: 'README.md'
 
   gitbookView: null
 
@@ -27,6 +46,7 @@ module.exports =
 
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-gitbook:toggle': => @togglePanel()
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-gitbook:force-reload-toc': => @forceReloadToC()
+    @subscriptions.add atom.commands.add 'atom-workspace', 'atom-gitbook:organize-summary': => @organizeSummary()
     @subscriptions.add atom.commands.add '.gitbook-navigation-pane', 'atom-gitbook:new-chapter': => @newChapter()
     @subscriptions.add atom.commands.add '.gitbook-navigation-pane .gitbook-page-item', 'atom-gitbook:delete-chapter': => @deleteChapter()
     @subscriptions.add atom.commands.add '.tree-view.full-menu', 'atom-gitbook:add-file-as-chapter': => @addFileAsChapter()
@@ -79,6 +99,9 @@ module.exports =
     parser.generateFileFromTree()
 
     @createView().refresh()
+
+  organizeSummary: ->
+    @createView().organizeSummary()
 
   deleteChapter: ->
     @createView().deleteChapter()
