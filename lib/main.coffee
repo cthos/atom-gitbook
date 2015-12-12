@@ -24,6 +24,15 @@ module.exports =
       description: "This is used when autogenerating a directory structure."
       type: 'string'
       default: './'
+    runGitbookInitAutomatically:
+      title: "Run gitbook init automatically"
+      description: "On certian ToC Changes, gitbook init can be run to fill out underlying files."
+      type: 'boolean'
+      default: false
+    chapterSummaryFileName:
+      title: "Chapter summary file name"
+      type: 'string'
+      default: 'README.md'
 
   gitbookView: null
 

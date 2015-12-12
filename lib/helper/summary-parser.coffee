@@ -118,6 +118,7 @@ class SummaryParser
     directory = basePath = atom.project.getPaths()[0]
 
     for ele, idx in @tree
+      ele.file = slug(ele.name, {replacement: "_", lower: true}) + '.md'
       # TODO: Not quite right, doesn't cover situation where it jumps back up an indent level
       if ele.indent > lastIndent
         parentEl = @ensureEleFolderFormat(directory, basePath, previousElement)
@@ -139,25 +140,46 @@ class SummaryParser
 
           parentPath = path.dirname(@tree[i].file)
           newPath = path.join(parentPath, path.basename(ele.file))
+          oldPath = ele.file
           ele.file = newPath
+
+          try
+            fs.moveSync(oldPath, newPath) if fs.statSync(oldPath).isFile()
+
           break
+      else if ele.indent == 0
+        oldPath = ele.file
+        directory = basePath
+
+        try
+          fs.moveSync(oldPath, ele.file) if fs.statSync(oldPath).isFile()
 
       previousElement = ele
       lastIndent = ele.indent
 
-    console.log @tree
+    @generateFileFromTree()
+
+    # gitbook init if available and configured to do so? TODO: Finish and test
+    # if atom.config.get('atom-gitbook.runGitbookInitAutomatically')
+      # require('child-process').exec('gitbook init')
 
   ensureEleFolderFormat: (rootPath, basePath, ele) ->
-    return ele if path.basename(ele.file) == 'README.md'
+    summaryFileName = atom.config.get('atom-gitbook.chapterSummaryFileName')
+    return ele if path.basename(ele.file) == summaryFileName and path.dirname(ele.file) == basePath
 
     folderSlug = slug(path.basename(ele.file, 'md'), {replacement: "_", lower: true})
     folderPath = path.join(rootPath, folderSlug)
 
-    # fs.mkdirSync(folderPath) unless fs.statSync(folderPath).isDirectory()
-    filename = path.join(folderPath, 'README.md')
+    try
+      fs.statSync(folderPath).isDirectory()
+    catch
+      fs.mkdirSync(folderPath)
+
+    filename = path.join(folderPath, summaryFileName)
 
     existingPath = path.join(rootPath, ele.file)
-    # fs.moveSync(existingPath, filename) if fs.statSync(existingPath).isFile()
+    try
+      fs.moveSync(existingPath, filename) if fs.statSync(existingPath).isFile()
 
     ele.file = path.relative(basePath, filename)
     ele

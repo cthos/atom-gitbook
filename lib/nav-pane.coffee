@@ -28,6 +28,8 @@ class NavigationPane extends View
     @getParser().reload(clearFile) if reloadFile
     @refreshTree()
 
+    @getParser().organizeFilesFromTree() if atom.config.get('atom-gitbook.autoOrganizeSummaryFileOnToCChange')
+
   initEvents: ->
     @on 'dblclick', '.gitbook-page-item', (e) =>
       ## Open File in Editor window if exists.
