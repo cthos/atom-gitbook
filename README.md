@@ -31,5 +31,7 @@ ln -s /path/to/atom-gitbook ~/.atom/packages/atom-gitbook
 
 ```bash
 cd atom-gitbook
-npm install
+apm install
 ```
+
+It might also be necessary to `apm rebuild` from time-to-time as atom gets updated.
