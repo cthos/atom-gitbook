@@ -68,7 +68,7 @@ class SummaryParser
     # Check for children of new parent if index was passed
     if toWriteIndex > 0 and index
       prevEl = @tree[toWriteIndex - 1]
-      if prevEl.indent
+      if prevEl? and prevEl.indent
         toWrite.indent = prevEl.indent
       # Look for child elements until you don't find an indent
       while (nextEl = @tree[toWriteIndex])?
