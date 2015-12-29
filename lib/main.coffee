@@ -50,6 +50,7 @@ module.exports =
     @subscriptions.add atom.commands.add '.gitbook-navigation-pane', 'atom-gitbook:new-chapter': => @newChapter()
     @subscriptions.add atom.commands.add '.gitbook-navigation-pane .gitbook-page-item', 'atom-gitbook:delete-chapter': => @deleteChapter()
     @subscriptions.add atom.commands.add '.tree-view.full-menu', 'atom-gitbook:add-file-as-chapter': => @addFileAsChapter()
+    @subscriptions.add atom.commands.add '.tree-view.full-menu', 'atom-gitbook:insert-file-reference': => @insertFileReference()
 
     if not atom.packages.isPackageDisabled 'markdown-preview'
       @subscriptions.add atom.workspace.observeActivePaneItem (pane) => @observePane(pane)
@@ -114,6 +115,21 @@ module.exports =
       return true
 
     false
+
+  insertFileReference: ->
+    selectedFile = $('.tree-view .selected .name')
+    return unless selectedFile[0]?
+    sf = selectedFile[0].dataset
+
+    editor = atom.workspace.getActiveTextEditor()
+    return unless editor?
+
+    wsPath = atom.project.getPaths()[0]
+    console.log editor.getPath()
+    console.log sf.path
+    file = path.relative(editor.getPath(), sf.path)
+    editor.insertText("{% include \"#{file}\" %}")
+
 
   forceReloadToC: ->
     return unless @open

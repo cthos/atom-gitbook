@@ -16,6 +16,10 @@
     {
       'label' : 'Add As Chapter',
       'command' : 'atom-gitbook:add-file-as-chapter'
+    },
+    {
+      'label' : 'Insert as Gitbook Include',
+      'command' : 'atom-gitbook:insert-file-reference'
     }
   ]
 'menu': [

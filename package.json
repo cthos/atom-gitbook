@@ -1,8 +1,8 @@
 {
   "name": "atom-gitbook",
   "main": "./lib/main",
-  "version": "0.0.0",
-  "description": "A short description of your package",
+  "version": "0.1.0",
+  "description": "Provides ToC and Markdown functionality for Gitbook",
   "keywords": [],
   "activationCommands": {},
   "repository": "https://github.com/atom/atom-gitbook",
@@ -11,8 +11,8 @@
     "atom": ">=1.0.0 <2.0.0"
   },
   "dependencies": {
-    "atom-space-pen-views": "^2.1.0",
-    "fs-plus": "^2.8.1",
-    "slug": "^0.9.1"
+    "atom-space-pen-views": "2.1.0",
+    "fs-plus": "2.8.1",
+    "slug": "0.9.1"
   }
 }

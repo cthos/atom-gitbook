@@ -5,14 +5,13 @@ MDRenderer = require path.join(atom.packages.resolvePackagePath('markdown-previe
 module.exports =
 class IncludeParser
 
-  @parseIncludesInText : (text, pathToCurrentFile) ->
-    re = new RegExp /(?:\<p\>)?\{\% include ([^\%]+) %\}(?:\<\/p\>)?/gi
+  @parseIncludesInText : (text, currentFileDir) ->
+    re = new RegExp /(?:\<p\>)?\{\% include ['"]([^\%]+)["'] %\}(?:\<\/p\>)?/gi
 
     while (arr = re.exec(text)) != null
       continue unless filename = arr[1]
-      editorPath = path.dirname(pathToCurrentFile)
 
-      includePath = path.join(editorPath, filename)
+      includePath = path.join(currentFileDir, filename)
 
       continue unless fs.existsSync(includePath)
       incText = fs.readFileSync(includePath, 'utf-8')
