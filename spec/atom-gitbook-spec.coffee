@@ -6,57 +6,34 @@ AtomGitbook = require '../lib/atom-gitbook'
 # or `fdescribe`). Remove the `f` to unfocus the block.
 
 describe "AtomGitbook", ->
-  [workspaceElement, activationPromise] = []
+  [workspaceElement, activationPromise, findNavPanel] = []
 
   beforeEach ->
     workspaceElement = atom.views.getView(atom.workspace)
     activationPromise = atom.packages.activatePackage('atom-gitbook')
 
+    findNavPanel = ->
+      panels = atom.workspace.getLeftPanels()
+      navPanel = null
+      panels.forEach (panel) ->
+        ## Feels like a hack....
+        navPanel = panel.getItem() if panel.item.constructor.name == 'NavigationPane'
+      navPanel
+
   describe "when the atom-gitbook:toggle event is triggered", ->
     it "hides and shows the modal panel", ->
-      # Before the activation event the view is not on the DOM, and no panel
-      # has been created
-      expect(workspaceElement.querySelector('.atom-gitbook')).not.toExist()
-
-      # This is an activation event, triggering it will cause the package to be
-      # activated.
-      atom.commands.dispatch workspaceElement, 'atom-gitbook:toggle'
+      expect(workspaceElement.querySelector('.gitbook-navigation-pane')).not.toExist()
 
       waitsForPromise ->
         activationPromise
 
       runs ->
-        expect(workspaceElement.querySelector('.atom-gitbook')).toExist()
-
-        atomGitbookElement = workspaceElement.querySelector('.atom-gitbook')
-        expect(atomGitbookElement).toExist()
-
-        atomGitbookPanel = atom.workspace.panelForItem(atomGitbookElement)
-        expect(atomGitbookPanel.isVisible()).toBe true
+        jasmine.attachToDOM(workspaceElement)
         atom.commands.dispatch workspaceElement, 'atom-gitbook:toggle'
-        expect(atomGitbookPanel.isVisible()).toBe false
+        panel = findNavPanel()
 
-    it "hides and shows the view", ->
-      # This test shows you an integration test testing at the view level.
+        expect(panel).toExist()
 
-      # Attaching the workspaceElement to the DOM is required to allow the
-      # `toBeVisible()` matchers to work. Anything testing visibility or focus
-      # requires that the workspaceElement is on the DOM. Tests that attach the
-      # workspaceElement to the DOM are generally slower than those off DOM.
-      jasmine.attachToDOM(workspaceElement)
-
-      expect(workspaceElement.querySelector('.atom-gitbook')).not.toExist()
-
-      # This is an activation event, triggering it causes the package to be
-      # activated.
-      atom.commands.dispatch workspaceElement, 'atom-gitbook:toggle'
-
-      waitsForPromise ->
-        activationPromise
-
-      runs ->
-        # Now we can test for view visibility
-        atomGitbookElement = workspaceElement.querySelector('.atom-gitbook')
-        expect(atomGitbookElement).toBeVisible()
+        expect(panel.isVisible()).toBe true
         atom.commands.dispatch workspaceElement, 'atom-gitbook:toggle'
-        expect(atomGitbookElement).not.toBeVisible()
+        expect(panel.isVisible()).toBe false
