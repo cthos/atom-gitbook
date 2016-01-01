@@ -88,7 +88,7 @@ class SummaryParser
     @tree
 
   parseFileToTree: (contents) ->
-    re = new RegExp /[\n\r]*(\s*)?\*\s+?\[([^\]]+?)\]\((.+?)\)/gi
+    re = new RegExp /[\n\r]*(\s*)?(?:\*|[0-9]+\.)\s+?\[([^\]]+?)\]\((.+?)\)/gi
 
     while (arr = re.exec(contents)) != null
       indent = 0
