@@ -142,7 +142,8 @@ class NavigationPane extends View
     childEl = document.createElement('li')
     childEl.classList.add('gitbook-page-item')
     childEl.classList.add('icon-file-text')
-    childEl.dataset.filename = treeEl.file
+    if treeEl.file
+      childEl.dataset.filename = treeEl.file
     childEl.setAttribute('draggable', true)
 
     childEl.innerHTML = treeEl.name
