@@ -116,7 +116,9 @@ class SummaryParser
 
     lines = []
     for ele in @tree
-      line = "* [#{ele.name}](#{ele.file})"
+      line = "* [#{ele.name}]"
+      if ele.file
+        line = line + "(#{ele.file})"
       if ele.indent > 0
         for i in [1..ele.indent]
           line = " " + line
