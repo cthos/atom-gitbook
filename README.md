@@ -35,3 +35,9 @@ apm install
 ```
 
 It might also be necessary to `apm rebuild` from time-to-time as atom gets updated.
+
+#### Problems on Mac
+
+I've been seeing an issue where the package will not rebuild unless you do an `npm install` using node `0.10.35`. I've tested this with `n` to manage the versions, but `nvm` should also work... I think.
+
+More info here: https://www.alextheward.com/blog/apm-rebuild/
