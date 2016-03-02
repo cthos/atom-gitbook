@@ -21,13 +21,13 @@ class NavigationPane extends View
   getParser: ->
     if not @parser?
       @parser = Parser.getInstance(atom.project.getPaths()[0])
+      @parser.onFileParsed (e) =>
+        @refreshTree()
       @parser.reload()
     @parser
 
   refresh: (reloadFile = false, clearFile = false) ->
     @getParser().reload(clearFile) if reloadFile
-    @refreshTree()
-
     @getParser().organizeFilesFromTree() if atom.config.get('atom-gitbook.autoOrganizeSummaryFileOnToCChange')
 
   initEvents: ->
@@ -71,7 +71,7 @@ class NavigationPane extends View
         @getParser().deleteSection(ds.filename)
         @getParser().addSection(@draggedElement.innerHTML, ds.filename, elFile, index)
         @getParser().generateFileFromTree()
-        @refresh()
+        @refresh(true)
 
         @draggedElement = null
 
@@ -102,7 +102,7 @@ class NavigationPane extends View
         fs.unlinkSync(fullPath)
 
     @getParser().generateFileFromTree()
-    @refreshTree()
+    @refresh(true)
 
   refreshTree: ->
     @tree[0].removeChild(@tree[0].firstChild) while @tree[0].firstChild
@@ -142,7 +142,8 @@ class NavigationPane extends View
     childEl = document.createElement('li')
     childEl.classList.add('gitbook-page-item')
     childEl.classList.add('icon-file-text')
-    childEl.dataset.filename = treeEl.file
+    if treeEl.file
+      childEl.dataset.filename = treeEl.file
     childEl.setAttribute('draggable', true)
 
     childEl.innerHTML = treeEl.name

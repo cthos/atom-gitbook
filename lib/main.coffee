@@ -141,5 +141,4 @@ module.exports =
       @open = false
     else
       @createView().show()
-      @createView().refresh(true)
       @open = true

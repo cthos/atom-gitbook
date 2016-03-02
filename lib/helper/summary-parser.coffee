@@ -1,6 +1,8 @@
+{Emitter} = require 'atom'
 path = require 'path'
 fs = require 'fs-plus'
 slug = require 'slug'
+gitbookparse = require 'gitbook-parsers'
 
 module.exports =
 class SummaryParser
@@ -10,6 +12,7 @@ class SummaryParser
     @instances[directory] ?= new SummaryParser(directory)
 
   constructor: (directory) ->
+    @emitter = new Emitter
     @directory = directory
 
     @loadFromFile(@directory)
@@ -18,11 +21,11 @@ class SummaryParser
     @lastFile = null
 
   loadFromFile: (directory) ->
-    @tree = []
-
     @lastFile = @getFullFilepath(directory) if directory? or not @lastFile?
 
     return unless @lastFile
+
+    @parser = gitbookparse.getForFile(@lastFile)
 
     contents = fs.readFileSync(@lastFile, 'utf-8')
     @parseFileToTree(contents)
@@ -80,6 +83,9 @@ class SummaryParser
     @tree
 
 
+  onFileParsed: (callback) ->
+    @emitter.on 'tree-parsing-complete', callback
+
   deleteSection: (filename) ->
     for ele, idx in @tree
       # Occasionally the tree gets borked?
@@ -88,22 +94,31 @@ class SummaryParser
     @tree
 
   parseFileToTree: (contents) ->
-    re = new RegExp /[\n\r]*(\s*)?(?:\*|[0-9]+\.)\s+?\[([^\]]+?)\]\((.+?)\)/gi
+    @parser.summary(contents).then (summary) =>
+      @tree = []
+      summary.chapters.forEach (chapter) =>
+        @addToTree(chapter, 0)
+        console.log "Emitting tree parse"
+      @emitter.emit 'tree-parsing-complete'
 
-    while (arr = re.exec(contents)) != null
-      indent = 0
-      indent = arr[1].length if arr[1]
+  addToTree: (chapter, indent) ->
+    treeObj = indent: indent, name: chapter.title, file: chapter.path
 
-      treeObj = indent: indent, name: arr[2], file: arr[3]
+    @tree.push(treeObj)
 
-      @tree.push(treeObj)
+    return if not chapter.articles
+
+    chapter.articles.forEach (article) =>
+      @addToTree(article, indent + 2)
 
   generateFileFromTree: (file) ->
     file = @lastFile if not file?
 
     lines = []
     for ele in @tree
-      line = "* [#{ele.name}](#{ele.file})"
+      line = "* [#{ele.name}]"
+      if ele.file
+        line = line + "(#{ele.file})"
       if ele.indent > 0
         for i in [1..ele.indent]
           line = " " + line
