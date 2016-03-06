@@ -115,7 +115,6 @@ class SummaryParser
     file = @lastFile if not file?
     
     extension = path.extname(file)
-    console.log(extension)
     switch extension
       when ".md", ".markdown", ".mdown"
         return require './markdown-summary'
