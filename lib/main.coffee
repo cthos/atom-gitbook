@@ -127,7 +127,7 @@ module.exports =
     wsPath = atom.project.getPaths()[0]
     console.log editor.getPath()
     console.log sf.path
-    file = path.relative(editor.getPath(), sf.path)
+    file = path.relative(wsPath, sf.path).replace(/\\/g, '/')
     editor.insertText("{% include \"#{file}\" %}")
 
 
