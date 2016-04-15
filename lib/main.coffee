@@ -29,6 +29,11 @@ module.exports =
       description: "On certian ToC Changes, gitbook init can be run to fill out underlying files."
       type: 'boolean'
       default: false
+    autoOpenMarkdownPreview:
+      title: "Automatically open the Markdown Preview"
+      description: "When opening a file from the table of contents, automatically toggle the preview pane."
+      type: 'boolean'
+      default: true
     chapterSummaryFileName:
       title: "Chapter summary file name"
       type: 'string'

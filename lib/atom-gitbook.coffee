@@ -14,7 +14,8 @@ class AtomGitbook
       atom.workspace.open(filepath).then =>
         # TODO: Helper Class?
         editorElement = atom.views.getView(atom.workspace.getActiveTextEditor())
-        atom.commands.dispatch(editorElement, 'markdown-preview:toggle')
+        if atom.config.get('atom-gitbook.autoOpenMarkdownPreview')
+          atom.commands.dispatch(editorElement, 'markdown-preview:toggle')
     else
       atom.confirm
         message: "Underlying File does not exist. Create it?"
