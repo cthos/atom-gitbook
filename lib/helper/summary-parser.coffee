@@ -111,21 +111,25 @@ class SummaryParser
     chapter.articles.forEach (article) =>
       @addToTree(article, indent + 2)
 
+  getSummaryWriter: (file) ->
+    file = @lastFile if not file?
+    
+    extension = path.extname(file)
+    switch extension
+      when ".md", ".markdown", ".mdown"
+        return require './markdown-summary'
+      when ".asdoc", ".asciidoc", ".adoc"
+        return require './asdoc-summary'
+      when ".rst"
+        return require './retext-summary'
+
   generateFileFromTree: (file) ->
     file = @lastFile if not file?
 
-    lines = []
-    for ele in @tree
-      line = "* [#{ele.name}]"
-      if ele.file
-        line = line + "(#{ele.file})"
-      if ele.indent > 0
-        for i in [1..ele.indent]
-          line = " " + line
-      lines.push(line)
-
-    linestr = lines.join("\n")
-
+    writer = @getSummaryWriter(file)
+    return if not writer?
+    
+    linestr = writer.formatTree(@tree)
     fs.writeFileSync(file, linestr)
 
   organizeFilesFromTree: (rootPath, file) ->
