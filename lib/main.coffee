@@ -1,5 +1,6 @@
 {CompositeDisposable} = require 'atom'
 path = require 'path'
+{exec} = require 'child_process'
 {$} = require 'atom-space-pen-views'
 fs = require 'fs-plus'
 {Emitter} = require 'atom'
@@ -56,6 +57,8 @@ module.exports =
     @subscriptions.add atom.commands.add '.gitbook-navigation-pane .gitbook-page-item', 'atom-gitbook:delete-chapter': => @deleteChapter()
     @subscriptions.add atom.commands.add '.tree-view.full-menu', 'atom-gitbook:add-file-as-chapter': => @addFileAsChapter()
     @subscriptions.add atom.commands.add '.tree-view.full-menu', 'atom-gitbook:insert-file-reference': => @insertFileReference()
+    
+    @subscriptions.add atom.commands.add 'atom-workspace', 'atom-gitbook:gitbook-init' : => @runGitbookCommand('init')
 
     if not atom.packages.isPackageDisabled 'markdown-preview'
       @subscriptions.add atom.workspace.observeActivePaneItem (pane) => @observePane(pane)
@@ -135,6 +138,13 @@ module.exports =
     file = path.relative(wsPath, sf.path).replace(/\\/g, '/')
     editor.insertText("{% include \"#{file}\" %}")
 
+  runGitbookCommand: (command) ->
+    command = 'gitbook ' + command
+    exec(command, {cwd: atom.project.getPaths()[0]}, (err, stdout, stderr) => 
+      console.log(err)
+      console.log(stdout)
+      console.log(stderr)
+    );
 
   forceReloadToC: ->
     return unless @open
