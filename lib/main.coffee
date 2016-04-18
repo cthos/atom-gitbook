@@ -5,6 +5,7 @@ path = require 'path'
 fs = require 'fs-plus'
 {Emitter} = require 'atom'
 IncludeParser = require './helper/include-parser'
+PathHelper = require './helper/path-helper'
 
 if not atom.packages.isPackageDisabled 'markdown-preview'
   MarkdownPreviewView = require path.join(atom.packages.resolvePackagePath('markdown-preview'), 'lib', 'markdown-preview-view')
@@ -119,7 +120,7 @@ module.exports =
     return false unless atom.project.getPaths()[0]?
 
     wsPath = atom.project.getPaths()[0]
-    if fs.existsSync(path.join(wsPath, 'summary.md')) or fs.existsSync(path.join(wsPath, 'book.json'))
+    if PathHelper.findExistingSummaryPath(wsPath)
       return true
 
     false
