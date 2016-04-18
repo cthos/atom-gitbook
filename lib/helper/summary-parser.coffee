@@ -2,7 +2,9 @@
 path = require 'path'
 fs = require 'fs-plus'
 slug = require 'slug'
+_ = require 'lodash'
 gitbookparse = require 'gitbook-parsers'
+PathHelper = require './path-helper'
 
 module.exports =
 class SummaryParser
@@ -36,15 +38,13 @@ class SummaryParser
 
   getFullFilepath: (directory) ->
     jsonContents = @findAndParseBookJson(directory)
-    summaryName = 'summary.md'
 
     if jsonContents and jsonContents.structure and jsonContents.structure.summary
       summaryName = jsonContents.structure.summary
+      summaryPath = path.join(directory, summaryName)
+      return summaryPath if fs.existsSync(summaryPath)
 
-    summaryPath = path.join(directory, summaryName)
-
-    return false unless fs.existsSync(summaryPath)
-    summaryPath
+    return PathHelper.findExistingSummaryPath(directory) or false
 
   findAndParseBookJson: (directory) ->
     bookPath = path.join(directory, 'book.json')
